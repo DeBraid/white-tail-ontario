@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <style>
+    .background {
+      fill: #fff;
+      pointer-events: all;
+    }
+
+    text {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-weight: 300;
+    }
+
+    text.big-text {
+      font-size: 30px;
+      font-weight: 400;
+    }
+  </style>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+</head>
+
+<body>
+
+  <script>
+
+    // URL of dataset
+    var url = "data.geojson";
+
+    // Set width and height of the map
+    var width = 960,
+      height = 900;
+
+    // Sets the projection and scale of the map
+    var projection = d3.geoMercator()
+      .scale(1800)
+      .translate([width / 4, height / 6])
+      .center([-91.5445018, 55.2280993]);
+
+    // Return the projection object
+    var path = d3.geoPath()
+      .projection(projection);
+
+    // Create the object that will contain the map
+    var map = d3.select("body")
+      .append("svg")
+      .attr("width", 960)
+      .attr("height", 900);
+
+    // Add a text-box for the feature name
+    var featureName = map.append('text')
+      .classed('big-text', true)
+      .attr('x', 20)
+      .attr('y', 45);
+
+    // Add a text box for the feature area
+    var featureArea = map.append('text')
+      .attr('x', 20)
+      .attr('y', 65);
+
+    // Load the data
+    d3.json(url).then(function (mapData) {
+
+      // Get features array
+      var features = mapData.features;
+
+      // Set the color scale
+      var color = d3.scaleLinear().domain([0, features.length]).range(["#f2ffe6","#59b300"]);
+
+      // Add the polygons
+      var polygons = map.selectAll('path')
+        .data(features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr("fill", fillFunction)
+        .attr("fill-opacity", 0.5)
+        .attr("stroke", "#222")
+        .on('mouseover', onMouseOver)
+        .on('mouseout', onMouseOut);
+
+      // OnMouseOver function
+      function onMouseOver(d, i) {
+        console.log('onMouseOver properties', d.properties);
+        d3.select(this).attr('fill', '#ffcb6b');
+        const textForFeature = d.properties.NAME + ' - ' + Math.round(d.properties.SYS_AREA/1000000) + '   KM²';
+
+        featureName.text(textForFeature);
+        // featureName.text(d.properties.NAME);
+        // featureArea.text(Math.round(d.properties.SYS_AREA/1000000) + '   KM²');
+      }
+
+      // OnMouseOut function
+      function onMouseOut(d, i) {
+        d3.select(this).attr('fill', fillFunction(d,i));
+
+        featureName.text('');
+        featureArea.text('');
+      }
+
+      // Fill function
+      function fillFunction(d, i) {
+        return color(i);
+      }
+    });
+
+  </script>
+</body>
+
+</html>

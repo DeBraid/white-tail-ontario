@@ -1,0 +1,14 @@
+.background {
+  fill: #fff;
+  pointer-events: all;
+}
+
+text {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+text.big-text {
+  font-size: 30px;
+  font-weight: 400;
+}

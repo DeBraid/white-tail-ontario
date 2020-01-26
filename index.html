@@ -42,8 +42,14 @@
       // Get features array
       var features = mapData.features;
 
+
+      // TODO: need to merge harvest values with features
+
+
       // Set the color scale
-      var color = d3.scaleLinear().domain([0, features.length]).range(["#f2ffe6","#59b300"]);
+      var minDomain = 0;
+      var maxDomain = features.length;
+      var color = d3.scaleLinear().domain([minDomain, maxDomain]).range(["#f2ffe6","#59b300"]);
 
       // Add the polygons
       var polygons = map.selectAll('path')
@@ -69,13 +75,12 @@
       // OnMouseOut function
       function onMouseOut(d, i) {
         d3.select(this).attr('fill', fillFunction(d,i));
-
         featureName.text('');
-        // featureArea.text('');
       }
 
       // Fill function
       function fillFunction(d, i) {
+        console.log('i', i);
         return color(i);
       }
     });

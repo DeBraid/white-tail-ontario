@@ -2,6 +2,7 @@
 // FILE IMPORTS
 const geoJsonPath = "data.geojson";
 const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
+
 const whiteTailRawData = d3.csv(whiteTailCSVPath);
 
 // Set width and height of the map
@@ -39,14 +40,14 @@ d3.json(geoJsonPath).then((mapData) => {
   const someFnToCalcNewFeatures = (features) => {
     features.map(feature => {
       const { WMU } = feature.properties;
-      feature.properties.data = [];
+      feature.properties.whitetail_hunting_data = [];
       // console.log('WMU', WMU);
       whiteTailRawData.then((whitetails) => {
         whitetails.map((whitetail_row) => {
           if (WMU == whitetail_row.WMU) {
             // console.log('GOT ONE whitetail_row WMU', whitetail_row);
             // features.properties.hunting_data = []
-            feature.properties.data.push(whitetail_row);
+            feature.properties.whitetail_hunting_data.push(whitetail_row);
           }
         });
       });

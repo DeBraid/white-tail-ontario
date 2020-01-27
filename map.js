@@ -63,7 +63,7 @@ d3.json(geoJsonPath).then((mapData) => {
 
   // Fill function
   const fillFunction = (d, i) => {
-    // console.log('i', i);
+    console.log('d whitetail_hunting_data', d.properties.whitetail_hunting_data);
     return color(i);
   };
 

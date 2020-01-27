@@ -1,20 +1,19 @@
-// map.js
-// URL of dataset
+
+// FILE IMPORTS
 const geoJsonPath = "data.geojson";
 const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
 const whiteTailRawData = d3.csv(whiteTailCSVPath);
 
-// whiteTailRawData();
-
 // Set width and height of the map
 const width = 800;
 const height = 800;
+const projectionCenter = [-91.5445018, 55.2280993];
 
 // Sets the projection and scale of the map
 const projection = d3.geoMercator()
   .scale(1800)
   .translate([width / 4, height / 6])
-  .center([-91.5445018, 55.2280993]);
+  .center(projectionCenter);
 
 // Return the projection object
 const path = d3.geoPath()
@@ -34,32 +33,34 @@ const featureName = map.append('text')
 
 // Load the data
 d3.json(geoJsonPath).then((mapData) => {
-  const features = mapData.features;
+  // const features = mapData.features;
+
   // TODO: need to merge harvest values with features
-  const newFeatures = features.map((feature) => {
-    const { WMU } = feature.properties;
-    feature.properties.data = [];
-    // console.log('WMU', WMU);
-    whiteTailRawData.then((whitetails) => {
-
-      whitetails.map((whitetail_row) => {
-        if (WMU == whitetail_row.WMU) {
-          // console.log('GOT ONE whitetail_row WMU', whitetail_row);
-          // features.properties.hunting_data = []
-          feature.properties.data.push(whitetail_row);
-        }
+  const someFnToCalcNewFeatures = (features) => {
+    features.map(feature => {
+      const { WMU } = feature.properties;
+      feature.properties.data = [];
+      // console.log('WMU', WMU);
+      whiteTailRawData.then((whitetails) => {
+        whitetails.map((whitetail_row) => {
+          if (WMU == whitetail_row.WMU) {
+            // console.log('GOT ONE whitetail_row WMU', whitetail_row);
+            // features.properties.hunting_data = []
+            feature.properties.data.push(whitetail_row);
+          }
+        });
       });
-
     });
+  };
 
-  });
+  const newFeatures = someFnToCalcNewFeatures(mapData.features);
   console.log('newFeatures', newFeatures);
 
 
 
   // Set the color scale
   const minDomain = 0;
-  const maxDomain = features.length;
+  const maxDomain = mapData.features.length;
   const colorRange = ["#f2ffe6","#59b300"];
   const color = d3.scaleLinear()
     .domain([minDomain, maxDomain])
@@ -73,7 +74,7 @@ d3.json(geoJsonPath).then((mapData) => {
 
   // Add the polygons
   const polygons = map.selectAll('path')
-    .data(features)
+    .data(mapData.features)
     .enter()
     .append('path')
     .attr('d', path)

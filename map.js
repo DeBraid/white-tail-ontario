@@ -36,11 +36,11 @@ d3.json(geoJsonPath)
   // TODO: need to merge harvest values with features
   features.map(feature => {
     const { WMU } = feature.properties;
-    feature.properties.whitetail_hunting_data = [];
+    feature.whitetail_hunting_data = [];
     d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
       whitetails.map((whitetail_row) => {
         if (WMU == whitetail_row.WMU) {
-          feature.properties.whitetail_hunting_data.push(whitetail_row);
+          feature.whitetail_hunting_data.push(whitetail_row);
         }
       });
     });
@@ -48,6 +48,8 @@ d3.json(geoJsonPath)
   return features;
 })
 .then((features) => {
+
+  console.log('features', features);
   // Set constants for color scale
   const minDomain = 0;
   const maxDomain = features.length;

@@ -30,46 +30,41 @@ const featureName = map.append('text')
   .attr('y', 45);
 
 // Load the data
-d3.json(geoJsonPath).then((mapData) => {
-  // const features = mapData.features;
-
+d3.json(geoJsonPath)
+.then((mapData) => {
+  const features = mapData.features;
   // TODO: need to merge harvest values with features
-  const someFnToCalcNewFeatures = (features) => {
-    features.map(feature => {
-      const { WMU } = feature.properties;
-      feature.properties.whitetail_hunting_data = [];
-      d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
-        whitetails.map((whitetail_row) => {
-          if (WMU == whitetail_row.WMU) {
-            feature.properties.whitetail_hunting_data.push(whitetail_row);
-          }
-        });
+  features.map(feature => {
+    const { WMU } = feature.properties;
+    feature.properties.whitetail_hunting_data = [];
+    d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
+      whitetails.map((whitetail_row) => {
+        if (WMU == whitetail_row.WMU) {
+          feature.properties.whitetail_hunting_data.push(whitetail_row);
+        }
       });
     });
-  };
-
-  const newFeatures = someFnToCalcNewFeatures(mapData.features);
-  console.log('newFeatures', newFeatures);
-
-
-
-  // Set the color scale
+  });
+  return features;
+})
+.then((features) => {
+  // Set constants for color scale
   const minDomain = 0;
-  const maxDomain = mapData.features.length;
+  const maxDomain = features.length;
   const colorRange = ["#f2ffe6","#59b300"];
+
+  // Color and Fill functions
   const color = d3.scaleLinear()
     .domain([minDomain, maxDomain])
     .range(colorRange);
 
-  // Fill function
   const fillFunction = (d, i) => {
-    console.log('d whitetail_hunting_data', d.properties.whitetail_hunting_data);
     return color(i);
   };
 
   // Add the polygons
   const polygons = map.selectAll('path')
-    .data(mapData.features)
+    .data(features)
     .enter()
     .append('path')
     .attr('d', path)

@@ -78,7 +78,7 @@ d3.json(geoJsonPath)
 
   // OnMouseOver function
   function onMouseOver(d, i) {
-    console.log('onMouseOver whitetail_hunting_data', d.properties.whitetail_hunting_data);
+    console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
     d3.select(this).attr('fill', '#ffcb6b');
     const featureText = d.properties.WMU + ' - ' + Math.round(d.properties.SYS_AREA/1000000) + '   KM²';
 

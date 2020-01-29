@@ -48,22 +48,17 @@ d3.json(geoJsonPath)
   return features;
 })
 .then((features) => {
-  // const someFnToCalcNewFeatures = (features) => {
-  // };
-
-
-
-  // Set the color scale
+  // Set constants for color scale
   const minDomain = 0;
   const maxDomain = features.length;
   const colorRange = ["#f2ffe6","#59b300"];
+
+  // Color and Fill functions
   const color = d3.scaleLinear()
     .domain([minDomain, maxDomain])
     .range(colorRange);
 
-  // Fill function
   const fillFunction = (d, i) => {
-    // console.log('d whitetail_hunting_data', d.properties.whitetail_hunting_data);
     return color(i);
   };
 

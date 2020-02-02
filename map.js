@@ -1,7 +1,7 @@
 
 // FILE IMPORTS
-const geoJsonPath = "data.geojson";
-
+const geoJsonPath = 'data.geojson';
+const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
 // Set width and height of the map
 const width = 800;
 const height = 800;
@@ -18,10 +18,10 @@ const path = d3.geoPath()
   .projection(projection);
 
 // Create the object that will contain the map
-const map = d3.select("body")
-  .append("svg")
-  .attr("width", width)
-  .attr("height", height);
+const map = d3.select('body')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
 
 // Add a text-box for the feature name
 const featureName = map.append('text')
@@ -31,7 +31,7 @@ const featureName = map.append('text')
 
 // Load the data
 const geoJson = () => d3.json(geoJsonPath);
-const whiteTailData = () => d3.csv('white-tailed_deer_2019.csv');
+const whiteTailData = () => d3.csv(whiteTailCSVPath);
 
 const whiteTailToMapFeatures = (map_data, white_tails) => {
   const features = map_data.features;
@@ -47,7 +47,7 @@ const whiteTailToMapFeatures = (map_data, white_tails) => {
 }
 
 const fetchData = async () => {
-  const [a, b] = await Promise.all([geoJson, whiteTailData])
+  const [a, b] = await Promise.all([geoJson, whiteTailData]);
   const mapData = await a();
   const whiteTailRaw = await b();
   return await whiteTailToMapFeatures(mapData, whiteTailRaw);
@@ -56,7 +56,7 @@ const fetchData = async () => {
 const drawChart = async () => {
   const features = await fetchData();
   console.log('drawChart features', features);
-  const minDomain = 0;
+  const minDomain = 0.15;
   // const whitetailsArr = features.map(f => {
   //   // console.log('f', f);
   //   f.whitetail_hunting_data
@@ -65,7 +65,7 @@ const drawChart = async () => {
 
   // const maxDomain = features.length;
   const maxDomain = 0.4;
-  const colorRange = ["#f2ffe6","#59b300"];
+  const colorRange = ['#fff','#59b300', '#006400'];
 
   // Color and Fill functions
   const color = d3.scaleLinear()
@@ -80,22 +80,21 @@ const drawChart = async () => {
     .enter()
     .append('path')
     .attr('d', path)
-    .attr("fill", fillFunction)
-    .attr("fill-opacity", 0.5)
-    .attr("stroke", "#222")
+    .attr('fill', fillFunction)
+    .attr('fill-opacity', 0.5)
+    .attr('stroke', '#222')
     .on('mouseover', onMouseOver)
     .on('mouseout', onMouseOut);
 
-  // OnMouseOver function
   function onMouseOver(d, i) {
     console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
     d3.select(this).attr('fill', '#ffcb6b');
-    const featureText = d.properties.WMU + ' - ' + Math.round(d.properties.SYS_AREA/1000000) + '   KM²';
+    const { WMU, SYS_AREA } = d.properties;
+    const featureText = WMU + ' - ' + Math.round(SYS_AREA/1000000) + '   KM²';
 
     featureName.text(featureText);
   }
 
-  // OnMouseOut function
   function onMouseOut(d, i) {
     d3.select(this).attr('fill', fillFunction(d,i));
     featureName.text('');

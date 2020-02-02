@@ -39,8 +39,8 @@ const whiteTailToMapFeatures = (map_data, white_tails) => {
   features.map(feature => {
     const { WMU } = feature.properties;
     white_tails.map((whitetail_row) => {
-      if (WMU == whitetail_row.WMU && whitetail_row.Year === '2018') {
-        feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest/whitetail_row.Active_Hunters)
+      if (WMU.includes(whitetail_row.WMU) && whitetail_row.Year === '2018') {
+        feature.whitetail_hunting_data = Number((whitetail_row.Total_Harvest/whitetail_row.Active_Hunters).toFixed(3));
       }
     });
   });
@@ -57,22 +57,19 @@ const fetchData = async () => {
 const drawChart = async () => {
   const features = await fetchData();
   console.log('drawChart features', features);
-  const minDomain = 0.15;
-  const domain = d3.extent(features.map(f => f.whitetail_hunting_data))
-  console.log('domain', domain);
-  // const whitetailsArr = features.map(f => {
-  //   // console.log('f', f);
-  //   f.whitetail_hunting_data
-  // });
-  // console.log('whitetailsArr', whitetailsArr);
+  const stats = _.compact(features.map(f => f.whitetail_hunting_data));
+  // console.log('stats', stats);
+  // const minDomain = d3.quantile(stats, 0.25);
+  // console.log('minDomain', minDomain);
+  const extent = d3.extent(stats);
+  console.log('extent', extent);
 
-  // const maxDomain = features.length;
-  const maxDomain = 0.4;
   const colorRange = ['#fff','#59b300', '#006400'];
 
   // Color and Fill functions
   const color = d3.scaleLinear()
-    .domain(domain)
+    // .domain([minDomain, maxDomain])
+    .domain(extent)
     .range(colorRange);
 
   const fillFunction = (d, i) => color(d.whitetail_hunting_data);

@@ -36,14 +36,18 @@ const featureName = map.append('text')
 const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018') => {
   const features = map_data.features;
   features.map(feature => {
-    const { WMU } = feature.properties;
-    white_tails.map((whitetail_row) => {
-      if (WMU.includes(whitetail_row.WMU) && whitetail_row.Year === target_year) {
-        feature.whitetail_hunting_data = Number((whitetail_row.Total_Harvest/whitetail_row.Active_Hunters).toFixed(3));
+    const mapWMU = feature.properties.WMU;
+    white_tails.map(({WMU, Year, Total_Harvest, Active_Hunters}) => {
+      if (mapWMU.includes(WMU) && Year === target_year) {
+        feature.whitetail_hunting_data = calcHarvestsPerHunter(Active_Hunters, Total_Harvest);
       }
     });
   });
   return features;
+
+  function calcHarvestsPerHunter (hunters, harvests) {
+    return hunters > 0 ? Number((harvests/hunters).toFixed(3)) : 0;
+  }
 }
 
 const fetchData = async (year) => {
@@ -56,6 +60,7 @@ const fetchData = async (year) => {
 const drawChart = async (whitetail_year = '2018') => {
   const features = await fetchData(whitetail_year);
   const domain = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
+  console.log('domain', domain);
   const colorRange = ['#fff','#59b300', '#006400'];
 
   const color = d3.scaleLinear()
@@ -88,6 +93,8 @@ const drawChart = async (whitetail_year = '2018') => {
     d3.select(this).attr('fill', fillFunction(d,i));
     featureName.text('');
   }
+
 }
 
-drawChart('2016');
+// drawChart('2016');
+drawChart('2010');

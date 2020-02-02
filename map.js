@@ -7,7 +7,6 @@ const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
 const geoJson = () => d3.json(geoJsonPath);
 const whiteTailData = () => d3.csv(whiteTailCSVPath);
 
-// Set width and height of the map
 const width = 800;
 const height = 800;
 const projectionCenter = [-91.5445018, 55.2280993];
@@ -34,12 +33,12 @@ const featureName = map.append('text')
   .attr('x', width/1.75)
   .attr('y', 45);
 
-const whiteTailToMapFeatures = (map_data, white_tails) => {
+const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018') => {
   const features = map_data.features;
   features.map(feature => {
     const { WMU } = feature.properties;
     white_tails.map((whitetail_row) => {
-      if (WMU.includes(whitetail_row.WMU) && whitetail_row.Year === '2018') {
+      if (WMU.includes(whitetail_row.WMU) && whitetail_row.Year === target_year) {
         feature.whitetail_hunting_data = Number((whitetail_row.Total_Harvest/whitetail_row.Active_Hunters).toFixed(3));
       }
     });
@@ -47,15 +46,15 @@ const whiteTailToMapFeatures = (map_data, white_tails) => {
   return features;
 }
 
-const fetchData = async () => {
+const fetchData = async (year) => {
   const [a, b] = await Promise.all([geoJson, whiteTailData]);
   const mapData = await a();
   const whiteTailRaw = await b();
-  return await whiteTailToMapFeatures(mapData, whiteTailRaw);
+  return await whiteTailToMapFeatures(mapData, whiteTailRaw, year);
 }
 
-const drawChart = async () => {
-  const features = await fetchData();
+const drawChart = async (whitetail_year = '2018') => {
+  const features = await fetchData(whitetail_year);
   const domain = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
   const colorRange = ['#fff','#59b300', '#006400'];
 
@@ -91,4 +90,4 @@ const drawChart = async () => {
   }
 }
 
-drawChart();
+drawChart('2016');

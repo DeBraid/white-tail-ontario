@@ -38,19 +38,39 @@ const whiteTailData = async () => {
   return await d3.csv('white-tailed_deer_2019.csv');
 }
 
+const whiteTailToMapFeatures = (map_data, white_tails) => {
+  const features = map_data.features;
+  // TODO: need to merge harvest values with features
+  features.map(feature => {
+    const { WMU } = feature.properties;
+    white_tails.map((whitetail_row) => {
+      if (WMU == whitetail_row.WMU) {
+        feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest)
+      }
+    });
+    // d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
+    // });
+  });
+  return features;
+}
+
 const fetchData = async () => {
   const [a, b] = await Promise.all([geoJson, whiteTailData])
   // console.log('fetchData a', a());
   // console.log('fetchData b', b());
   const mapData = await a();
-  const bar = await b();
+  const whiteTailRaw = await b();
   console.log('fetchData mapData.features', mapData.features);
-  console.log('fetchData bar', bar);
+  console.log('fetchData whiteTailRaw', whiteTailRaw);
+
+  const baz = whiteTailToMapFeatures(mapData, whiteTailRaw);
+  console.log('baz', baz);
 }
 
 fetchData();
 
 d3.json(geoJsonPath)
+
 .then((mapData) => {
   const features = mapData.features;
   // TODO: need to merge harvest values with features

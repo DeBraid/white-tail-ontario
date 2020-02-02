@@ -2,6 +2,11 @@
 // FILE IMPORTS
 const geoJsonPath = 'data.geojson';
 const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
+
+// Load the data as Promises
+const geoJson = () => d3.json(geoJsonPath);
+const whiteTailData = () => d3.csv(whiteTailCSVPath);
+
 // Set width and height of the map
 const width = 800;
 const height = 800;
@@ -29,10 +34,6 @@ const featureName = map.append('text')
   .attr('x', width/1.75)
   .attr('y', 45);
 
-// Load the data
-const geoJson = () => d3.json(geoJsonPath);
-const whiteTailData = () => d3.csv(whiteTailCSVPath);
-
 const whiteTailToMapFeatures = (map_data, white_tails) => {
   const features = map_data.features;
   features.map(feature => {
@@ -57,6 +58,8 @@ const drawChart = async () => {
   const features = await fetchData();
   console.log('drawChart features', features);
   const minDomain = 0.15;
+  const domain = d3.extent(features.map(f => f.whitetail_hunting_data))
+  console.log('domain', domain);
   // const whitetailsArr = features.map(f => {
   //   // console.log('f', f);
   //   f.whitetail_hunting_data
@@ -69,7 +72,7 @@ const drawChart = async () => {
 
   // Color and Fill functions
   const color = d3.scaleLinear()
-    .domain([minDomain, maxDomain])
+    .domain(domain)
     .range(colorRange);
 
   const fillFunction = (d, i) => color(d.whitetail_hunting_data);

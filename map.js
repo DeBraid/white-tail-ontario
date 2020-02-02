@@ -30,13 +30,8 @@ const featureName = map.append('text')
   .attr('y', 45);
 
 // Load the data
-const geoJson = async () => {
-  return await d3.json(geoJsonPath).then(results => results);
-}
-
-const whiteTailData = async () => {
-  return await d3.csv('white-tailed_deer_2019.csv');
-}
+const geoJson = () => d3.json(geoJsonPath);
+const whiteTailData = () => d3.csv('white-tailed_deer_2019.csv');
 
 const whiteTailToMapFeatures = (map_data, white_tails) => {
   const features = map_data.features;

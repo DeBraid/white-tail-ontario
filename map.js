@@ -30,8 +30,8 @@ const map = d3.select('body')
 // Add a text-box for the feature name
 const featureName = map.append('text')
   .classed('big-text', true)
-  .attr('x', width/1.75)
-  .attr('y', 45);
+  .attr('x', 10)
+  .attr('y', 30);
 
 const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018') => {
   const features = map_data.features;
@@ -81,12 +81,12 @@ const drawChart = async (whitetail_year = '2018') => {
     .on('mouseout', onMouseOut);
 
   function onMouseOver(d, i) {
-    console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
+    // console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
     d3.select(this).attr('fill', '#ffcb6b');
     const { WMU, SYS_AREA } = d.properties;
-    const featureText = WMU + ' - ' + Math.round(SYS_AREA/1000000) + '   KM²';
-
-    featureName.text(featureText);
+    const area = Math.round(SYS_AREA/1000000);
+    const text = WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
+    featureName.text(text);
   }
 
   function onMouseOut(d, i) {

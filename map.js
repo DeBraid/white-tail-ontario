@@ -43,8 +43,8 @@ const whiteTailToMapFeatures = (map_data, white_tails) => {
   features.map(feature => {
     const { WMU } = feature.properties;
     white_tails.map((whitetail_row) => {
-      if (WMU == whitetail_row.WMU) {
-        feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest)
+      if (WMU == whitetail_row.WMU && whitetail_row.Year === '2018') {
+        feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest/whitetail_row.Active_Hunters)
       }
     });
   });
@@ -69,7 +69,7 @@ const drawChart = async () => {
   // console.log('whitetailsArr', whitetailsArr);
 
   // const maxDomain = features.length;
-  const maxDomain = 5000;
+  const maxDomain = 0.4;
   const colorRange = ["#f2ffe6","#59b300"];
 
   // Color and Fill functions
@@ -108,72 +108,3 @@ const drawChart = async () => {
 }
 
 drawChart();
-
-// d3.json(geoJsonPath)
-
-// .then((mapData) => {
-//   const features = mapData.features;
-//   // TODO: need to merge harvest values with features
-//   features.map(feature => {
-//     const { WMU } = feature.properties;
-//     // feature.whitetail_hunting_data = [];
-//     d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
-//       whitetails.map((whitetail_row) => {
-//         if (WMU == whitetail_row.WMU) {
-//           feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest)
-//         }
-//       });
-//     });
-//   });
-//   return features;
-// })
-
-// .then((features) => {
-
-//   console.log('features', features);
-//   // Set constants for color scale
-//   const minDomain = 0;
-//   // const whitetailsArr = features.map(f => {
-//   //   // console.log('f', f);
-//   //   f.whitetail_hunting_data
-//   // });
-//   // console.log('whitetailsArr', whitetailsArr);
-//   const maxDomain = features.length;
-//   const colorRange = ["#f2ffe6","#59b300"];
-
-//   // Color and Fill functions
-//   const color = d3.scaleLinear()
-//     .domain([minDomain, maxDomain])
-//     .range(colorRange);
-
-//   const fillFunction = (d, i) => {
-//     return color(d.whitetail_hunting_data);
-//   };
-
-//   // Add the polygons
-//   const polygons = map.selectAll('path')
-//     .data(features)
-//     .enter()
-//     .append('path')
-//     .attr('d', path)
-//     .attr("fill", fillFunction)
-//     .attr("fill-opacity", 0.5)
-//     .attr("stroke", "#222")
-//     .on('mouseover', onMouseOver)
-//     .on('mouseout', onMouseOut);
-
-//   // OnMouseOver function
-//   function onMouseOver(d, i) {
-//     console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
-//     d3.select(this).attr('fill', '#ffcb6b');
-//     const featureText = d.properties.WMU + ' - ' + Math.round(d.properties.SYS_AREA/1000000) + '   KM²';
-
-//     featureName.text(featureText);
-//   }
-
-//   // OnMouseOut function
-//   function onMouseOut(d, i) {
-//     d3.select(this).attr('fill', fillFunction(d,i));
-//     featureName.text('');
-//   }
-// });

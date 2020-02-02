@@ -56,25 +56,15 @@ const fetchData = async () => {
 
 const drawChart = async () => {
   const features = await fetchData();
-  console.log('drawChart features', features);
-  const stats = _.compact(features.map(f => f.whitetail_hunting_data));
-  // console.log('stats', stats);
-  // const minDomain = d3.quantile(stats, 0.25);
-  // console.log('minDomain', minDomain);
-  const extent = d3.extent(stats);
-  console.log('extent', extent);
-
+  const domain = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
   const colorRange = ['#fff','#59b300', '#006400'];
 
-  // Color and Fill functions
   const color = d3.scaleLinear()
-    // .domain([minDomain, maxDomain])
-    .domain(extent)
+    .domain(domain)
     .range(colorRange);
 
   const fillFunction = (d, i) => color(d.whitetail_hunting_data);
 
-  // Add the polygons
   const polygons = map.selectAll('path')
     .data(features)
     .enter()

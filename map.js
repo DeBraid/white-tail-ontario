@@ -30,17 +30,37 @@ const featureName = map.append('text')
   .attr('y', 45);
 
 // Load the data
+const geoJson = async () => {
+  return await d3.json(geoJsonPath).then(results => results);
+}
+
+const whiteTailData = async () => {
+  return await d3.csv('white-tailed_deer_2019.csv');
+}
+
+const fetchData = async () => {
+  const [a, b] = await Promise.all([geoJson, whiteTailData])
+  // console.log('fetchData a', a());
+  // console.log('fetchData b', b());
+  const mapData = await a();
+  const bar = await b();
+  console.log('fetchData mapData.features', mapData.features);
+  console.log('fetchData bar', bar);
+}
+
+fetchData();
+
 d3.json(geoJsonPath)
 .then((mapData) => {
   const features = mapData.features;
   // TODO: need to merge harvest values with features
   features.map(feature => {
     const { WMU } = feature.properties;
-    feature.whitetail_hunting_data = [];
+    // feature.whitetail_hunting_data = [];
     d3.csv('white-tailed_deer_2019.csv').then((whitetails) => {
       whitetails.map((whitetail_row) => {
         if (WMU == whitetail_row.WMU) {
-          feature.whitetail_hunting_data.push(whitetail_row);
+          feature.whitetail_hunting_data = Number(whitetail_row.Total_Harvest)
         }
       });
     });
@@ -52,6 +72,11 @@ d3.json(geoJsonPath)
   console.log('features', features);
   // Set constants for color scale
   const minDomain = 0;
+  // const whitetailsArr = features.map(f => {
+  //   // console.log('f', f);
+  //   f.whitetail_hunting_data
+  // });
+  // console.log('whitetailsArr', whitetailsArr);
   const maxDomain = features.length;
   const colorRange = ["#f2ffe6","#59b300"];
 
@@ -61,7 +86,7 @@ d3.json(geoJsonPath)
     .range(colorRange);
 
   const fillFunction = (d, i) => {
-    return color(i);
+    return color(d.whitetail_hunting_data);
   };
 
   // Add the polygons

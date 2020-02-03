@@ -60,19 +60,13 @@ const fetchData = async (year) => {
 
 
 const drawChart = async (whitetail_year = '2018') => {
-
-
-
+  // FIXME DB -- this is hacky, clean this up
   const yr = document.getElementById('year-dropdown');
   const year = yr.options[yr.selectedIndex].value;
-  console.log('year', year);
   whitetail_year = year && year.length ? year : whitetail_year;
-  console.log('whitetail_year', whitetail_year);
-
-
-
   d3.select('#year').text(whitetail_year);
 
+  console.log('drawChart whitetail_year', whitetail_year);
   const features = await fetchData(whitetail_year);
   const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
   const variance = d3.variance(extent);
@@ -118,6 +112,10 @@ const dropdownChange = function() {
     d3.select('#year')
       .text('');
 
+    map.selectAll('path')
+    .remove();
+
+      console.log('dropdownChange newYear', newYear);
     drawChart(newYear);
 };
 const dropdown = d3.select("#year-dropdown").on("change", dropdownChange);

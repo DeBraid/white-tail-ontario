@@ -60,8 +60,7 @@ const fetchData = async (year) => {
 const drawChart = async (whitetail_year = '2018') => {
 
   const year = location.search.split('year=')[1];
-  whitetail_year = year.length ? year : whitetail_year;
-  console.log('whitetail_year', whitetail_year);
+  whitetail_year = year && year.length ? year : whitetail_year;
 
   const features = await fetchData(whitetail_year);
   const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
@@ -88,7 +87,6 @@ const drawChart = async (whitetail_year = '2018') => {
     .on('mouseout', onMouseOut);
 
   function onMouseOver(d, i) {
-    // console.log('onMouseOver whitetail_hunting_data', d.whitetail_hunting_data);
     d3.select(this).attr('fill', '#ffcb6b');
     const { WMU, SYS_AREA } = d.properties;
     const area = Math.round(SYS_AREA/1000000);
@@ -103,5 +101,4 @@ const drawChart = async (whitetail_year = '2018') => {
 
 }
 
-// drawChart('2016');
-drawChart('2010');
+drawChart();

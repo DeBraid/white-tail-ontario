@@ -58,9 +58,16 @@ const fetchData = async (year) => {
 }
 
 const drawChart = async (whitetail_year = '2018') => {
+
+  const year = location.search.split('year=')[1];
+  whitetail_year = year.length ? year : whitetail_year;
+  console.log('whitetail_year', whitetail_year);
+
   const features = await fetchData(whitetail_year);
-  const domain = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
-  console.log('domain', domain);
+  const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
+  const variance = d3.variance(extent);
+  const median = d3.median(extent);
+  const domain = [median-variance, median+variance];
   const colorRange = ['#fff','#59b300', '#006400'];
 
   const color = d3.scaleLinear()

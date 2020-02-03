@@ -62,6 +62,10 @@ const drawChart = async (whitetail_year = '2018') => {
   const year = location.search.split('year=')[1];
   whitetail_year = year && year.length ? year : whitetail_year;
 
+  d3.select('#year')
+    .append('text')
+    .text(whitetail_year);
+
   const features = await fetchData(whitetail_year);
   const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
   const variance = d3.variance(extent);

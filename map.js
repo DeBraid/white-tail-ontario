@@ -57,18 +57,21 @@ const fetchData = async (year) => {
   return await whiteTailToMapFeatures(mapData, whiteTailRaw, year);
 }
 
+
+
 const drawChart = async (whitetail_year = '2018') => {
 
-  // const year = location.search.split('year=')[1];
-  // const year = d3.select('#year-dropdown').;
+
+
   const yr = document.getElementById('year-dropdown');
   const year = yr.options[yr.selectedIndex].value;
   console.log('year', year);
   whitetail_year = year && year.length ? year : whitetail_year;
   console.log('whitetail_year', whitetail_year);
-  d3.select('#year')
-    .append('text')
-    .text(whitetail_year);
+
+
+
+  d3.select('#year').text(whitetail_year);
 
   const features = await fetchData(whitetail_year);
   const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
@@ -108,5 +111,15 @@ const drawChart = async (whitetail_year = '2018') => {
   }
 
 }
+
+const dropdownChange = function() {
+    const newYear = d3.select(this).property('value');
+
+    d3.select('#year')
+      .text('');
+
+    drawChart(newYear);
+};
+const dropdown = d3.select("#year-dropdown").on("change", dropdownChange);
 
 drawChart();

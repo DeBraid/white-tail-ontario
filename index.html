@@ -13,7 +13,7 @@
       <h1>Ontario Deer Hunting Map</h1>
       <p id="wmu-summary"></p>
       <div>
-        <select id="year-dropdown">
+        <select id="year-dropdown" class="dropdown">
           <option value="2018">2018</option>
           <option value="2017">2017</option>
           <option value="2016">2016</option>
@@ -26,9 +26,16 @@
           <option value="2009">2009</option>
           <option value="2008">2008</option>
         </select>
-        <select id="region-dropdown" style="margin-left: 1em">
+
+        <select id="region-dropdown" style="margin-left: 1em" class="dropdown">
           <option value="default">Ontario</option>
-          <option value="south">South</option>
+          <option value="south">Southern Ontario</option>
+        </select>
+
+        <select id="harvest-dropdown" style="margin-left: 1em" class="dropdown">
+          <option value="Total_Harvest">Total</option>
+          <option value="Antlered_Harvest">Bucks (Antlered)</option>
+          <option value="Antlerless_Harvest">Does (Antlerless)</option>
         </select>
       </div>
 

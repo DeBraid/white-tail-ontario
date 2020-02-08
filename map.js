@@ -30,13 +30,16 @@ const setMapProjection = ({ scale, center }) => d3.geoMercator()
   .translate([width / 4, height / 6])
   .center(center);
 
-const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018') => {
+const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', harvest_type = 'Antlered_Harvest') => {
   const features = map_data.features;
   features.map(feature => {
     const mapWMU = feature.properties.WMU;
-    white_tails.map(({WMU, Year, Total_Harvest, Active_Hunters}) => {
+    white_tails.map((kill_data) => {
+      const { WMU, Year, Active_Hunters } = kill_data;
       if (mapWMU.includes(WMU) && Year === target_year) {
-        feature.whitetail_hunting_data = calcHarvestsPerHunter(Active_Hunters, Total_Harvest);
+        const deerType = kill_data[harvest_type];
+        feature.whitetail_hunting_data = calcHarvestsPerHunter(Active_Hunters, deerType);
+
       }
     });
   });
@@ -51,7 +54,9 @@ const fetchData = async (year) => {
   const [a, b] = await Promise.all([geoJson, whiteTailData]);
   const mapData = await a();
   const whiteTailRaw = await b();
-  return await whiteTailToMapFeatures(mapData, whiteTailRaw, year);
+  const harvestType = d3.select('#harvest-dropdown').property('value');
+  console.log('harvestType', harvestType);
+  return await whiteTailToMapFeatures(mapData, whiteTailRaw, year, harvestType);
 }
 
 const drawChart = async (whitetail_year = '2018') => {
@@ -62,11 +67,12 @@ const drawChart = async (whitetail_year = '2018') => {
 
   const region = d3.select('#region-dropdown').property('value');
   const projection = setMapProjection(mapConfig[region]);
-  // Return the projection object
+
+  console.log('drawChart year, region', whitetail_year, region);
+
   const path = d3.geoPath()
     .projection(projection);
 
-  // Create the object that will contain the map
   const map = d3.select('#map-container')
     .append('svg')
     .attr('width', width)
@@ -114,34 +120,14 @@ const drawChart = async (whitetail_year = '2018') => {
     mouseOverSummaryText();
   }
 
+  const onDropdownChange = () => {
+      d3.selectAll('svg').remove();
+      drawChart();
+  }
+
+  d3.selectAll(".dropdown").on("change", onDropdownChange);
+
 }
 
-const dropdownChange = function() {
-    const newYear = d3.select(this).property('value');
-
-    d3.select('#year')
-      .text('');
-    // FIXME DB this is hacky
-    d3.selectAll('svg')
-    .remove();
-
-      console.log('dropdownChange newYear', newYear);
-    drawChart(newYear);
-};
-const dropdown = d3.select("#year-dropdown").on("change", dropdownChange);
-
-const regionChange = function() {
-    const newRegion = d3.select(this).property('value');
-    console.log('newRegion', newRegion);
-
-    d3.select('#year')
-      .text('');
-    // FIXME DB this is hacky
-    d3.selectAll('svg')
-    .remove();
-
-    drawChart();
-};
-const regionDropdown = d3.select("#region-dropdown").on("change", regionChange);
 
 drawChart();

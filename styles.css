@@ -44,10 +44,6 @@ select {
     white-space: nowrap;
 }
 
-#year-dropdown {
-  padding: 2rem;
-}
-
 #wmu-summary {
   font-size: 1.5em;
 }

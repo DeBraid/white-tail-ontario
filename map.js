@@ -1,5 +1,12 @@
 
-// FILE IMPORTS
+/*
+
+WMU Notes Regions can be define as:
+-- North =<45
+-- Southeast 46-78
+-- Southwest >=79
+
+*/
 const geoJsonPath = 'data.geojson';
 const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
 

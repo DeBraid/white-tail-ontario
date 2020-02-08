@@ -131,10 +131,8 @@ const drawChart = async (whitetail_year = '2018') => {
       d3.selectAll('svg').remove();
       drawChart();
   }
-
   d3.selectAll(".dropdown").on("change", onDropdownChange);
 
 }
-
 
 drawChart();

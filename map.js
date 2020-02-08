@@ -9,13 +9,27 @@ const whiteTailData = () => d3.csv(whiteTailCSVPath);
 
 const width = 800;
 const height = 800;
-const projectionCenter = [-91.5445018, 55.2280993];
 
-// Sets the projection and scale of the map
-const projection = d3.geoMercator()
-  .scale(1800)
+const mapConfig = {
+  default: {
+    scale: 1800,
+    center:[-91.5445018, 55.2280993],
+  },
+  south: {
+    scale: 3500,
+    center:[-84.641971,49.0719856],
+  }
+}
+
+const setMapProjection = ({ scale, center }) => d3.geoMercator()
+  .scale(scale)
   .translate([width / 4, height / 6])
-  .center(projectionCenter);
+  .center(center);
+// Sets the projection and scale of the map
+
+// const projection = setMapProjection(havelockScale, havelockProjection);
+// const projection = setMapProjection(mapConfig.default);
+const projection = setMapProjection(mapConfig.south);
 
 // Return the projection object
 const path = d3.geoPath()

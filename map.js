@@ -7,9 +7,6 @@ const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
 const geoJson = () => d3.json(geoJsonPath);
 const whiteTailData = () => d3.csv(whiteTailCSVPath);
 
-const width = 800;
-const height = 800;
-
 const mapConfig = {
   default: {
     scale: 1800,
@@ -19,7 +16,14 @@ const mapConfig = {
     scale: 3500,
     center:[-84.641971,49.0719856],
   }
-}
+};
+const height = 800;
+const width = d3.select('#map-container')
+  .node()
+  .getBoundingClientRect()
+  .width
+  .toFixed();
+
 
 const setMapProjection = ({ scale, center }) => d3.geoMercator()
   .scale(scale)
@@ -63,7 +67,7 @@ const drawChart = async (whitetail_year = '2018') => {
     .projection(projection);
 
   // Create the object that will contain the map
-  const map = d3.select('body')
+  const map = d3.select('#map-container')
     .append('svg')
     .attr('width', width)
     .attr('height', height);

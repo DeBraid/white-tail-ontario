@@ -21,31 +21,10 @@ const mapConfig = {
   }
 }
 
-const setMapProjection = ({ scale, center }) => d3.geoMercator()
+  const setMapProjection = ({ scale, center }) => d3.geoMercator()
   .scale(scale)
   .translate([width / 4, height / 6])
   .center(center);
-// Sets the projection and scale of the map
-
-// const projection = setMapProjection(havelockScale, havelockProjection);
-// const projection = setMapProjection(mapConfig.default);
-const projection = setMapProjection(mapConfig.south);
-
-// Return the projection object
-const path = d3.geoPath()
-  .projection(projection);
-
-// Create the object that will contain the map
-const map = d3.select('body')
-  .append('svg')
-  .attr('width', width)
-  .attr('height', height);
-
-// Add a text-box for the feature name
-const featureName = map.append('text')
-  .classed('big-text', true)
-  .attr('x', 10)
-  .attr('y', 30);
 
 const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018') => {
   const features = map_data.features;
@@ -71,14 +50,30 @@ const fetchData = async (year) => {
   return await whiteTailToMapFeatures(mapData, whiteTailRaw, year);
 }
 
-
-
 const drawChart = async (whitetail_year = '2018') => {
   // FIXME DB -- this is hacky, clean this up
   const yr = document.getElementById('year-dropdown');
   const year = yr.options[yr.selectedIndex].value;
   whitetail_year = year && year.length ? year : whitetail_year;
-  d3.select('#year').text(whitetail_year);
+
+  const region = d3.select('#region-dropdown').property('value');
+  const projection = setMapProjection(mapConfig[region]);
+  // Return the projection object
+  const path = d3.geoPath()
+    .projection(projection);
+
+  // Create the object that will contain the map
+  const map = d3.select('body')
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
+
+  // Add a text-box for the feature name
+  const featureName = (text = 'Hover on WMU for summary') => d3.select('#wmu-summary').text(text);
+  featureName();
+    // .classed('big-text', true)
+    // .attr('x', 10)
+    // .attr('y', 30);
 
   console.log('drawChart whitetail_year', whitetail_year);
   const features = await fetchData(whitetail_year);
@@ -110,12 +105,12 @@ const drawChart = async (whitetail_year = '2018') => {
     const { WMU, SYS_AREA } = d.properties;
     const area = Math.round(SYS_AREA/1000000);
     const text = WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
-    featureName.text(text);
+    featureName(text);
   }
 
   function onMouseOut(d, i) {
     d3.select(this).attr('fill', fillFunction(d,i));
-    featureName.text('');
+    featureName();
   }
 
 }
@@ -125,8 +120,8 @@ const dropdownChange = function() {
 
     d3.select('#year')
       .text('');
-
-    map.selectAll('path')
+    // FIXME DB this is hacky
+    d3.selectAll('svg')
     .remove();
 
       console.log('dropdownChange newYear', newYear);
@@ -138,14 +133,13 @@ const regionChange = function() {
     const newRegion = d3.select(this).property('value');
     console.log('newRegion', newRegion);
 
-    // d3.select('#year')
-    //   .text('');
+    d3.select('#year')
+      .text('');
+    // FIXME DB this is hacky
+    d3.selectAll('svg')
+    .remove();
 
-    // map.selectAll('path')
-    // .remove();
-
-    //   console.log('dropdownChange newYear', newYear);
-    // drawChart(newYear);
+    drawChart();
 };
 const regionDropdown = d3.select("#region-dropdown").on("change", regionChange);
 

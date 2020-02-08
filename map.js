@@ -21,7 +21,7 @@ const mapConfig = {
   }
 }
 
-  const setMapProjection = ({ scale, center }) => d3.geoMercator()
+const setMapProjection = ({ scale, center }) => d3.geoMercator()
   .scale(scale)
   .translate([width / 4, height / 6])
   .center(center);
@@ -68,14 +68,11 @@ const drawChart = async (whitetail_year = '2018') => {
     .attr('width', width)
     .attr('height', height);
 
-  // Add a text-box for the feature name
-  const featureName = (text = 'Hover on WMU for summary') => d3.select('#wmu-summary').text(text);
-  featureName();
-    // .classed('big-text', true)
-    // .attr('x', 10)
-    // .attr('y', 30);
+  const mouseOverSummaryText = (text = 'Hover on WMU for summary') =>
+    d3.select('#wmu-summary').text(text);
 
-  console.log('drawChart whitetail_year', whitetail_year);
+  mouseOverSummaryText();
+
   const features = await fetchData(whitetail_year);
   const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
   const variance = d3.variance(extent);
@@ -104,13 +101,13 @@ const drawChart = async (whitetail_year = '2018') => {
     d3.select(this).attr('fill', '#ffcb6b');
     const { WMU, SYS_AREA } = d.properties;
     const area = Math.round(SYS_AREA/1000000);
-    const text = WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
-    featureName(text);
+    const text = 'WMU: ' + WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
+    mouseOverSummaryText(text);
   }
 
   function onMouseOut(d, i) {
     d3.select(this).attr('fill', fillFunction(d,i));
-    featureName();
+    mouseOverSummaryText();
   }
 
 }

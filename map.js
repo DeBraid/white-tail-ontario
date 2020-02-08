@@ -134,4 +134,19 @@ const dropdownChange = function() {
 };
 const dropdown = d3.select("#year-dropdown").on("change", dropdownChange);
 
+const regionChange = function() {
+    const newRegion = d3.select(this).property('value');
+    console.log('newRegion', newRegion);
+
+    // d3.select('#year')
+    //   .text('');
+
+    // map.selectAll('path')
+    // .remove();
+
+    //   console.log('dropdownChange newYear', newYear);
+    // drawChart(newYear);
+};
+const regionDropdown = d3.select("#region-dropdown").on("change", regionChange);
+
 drawChart();

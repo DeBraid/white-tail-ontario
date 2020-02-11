@@ -43,20 +43,26 @@ const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', har
     white_tails.map((kill_data) => {
       const { WMU, Year, Active_Hunters } = kill_data;
       if (mapWMU.includes(WMU) && Year === target_year) {
-        const deerType = kill_data[harvest_type];
-        console.log('harvest_type', harvest_type);
-        feature.whitetail_hunting_data = calcHarvestsPerHunter(Active_Hunters, deerType);
+        console.log('harvest_type.split', harvest_type.split('_Per')[0]);
+        const deerType = kill_data[harvest_type.split('_Per')[0]];
+        // const deerType = kill_data[harvest_type];
+        console.log('deerType', deerType);
+        feature.whitetail_hunting_data = calcWhiteTailData(deerType, Active_Hunters, harvest_type);
 
       }
     });
   });
   return features;
 
-  function calcHarvestsPerHunter (hunters, harvests) {
-    console.log('hunters', hunters);
-    console.log('harvests', harvests);
-    // return hunters > 0 ? Number((harvests/hunters).toFixed(3)) : 0;
-    return hunters;
+  function calcWhiteTailData (n, d, harvest_type) {
+    console.log('n', n);
+    console.log('d', d);
+    let val = n;
+    console.log('harvest_type.includes', harvest_type.includes('_Per'));
+    if (d && harvest_type.includes('_Per')) {
+      val = d > 0 ? Number((n/d).toFixed(3)) : 0;
+    }
+    return val;
   }
 }
 
@@ -94,9 +100,8 @@ const drawChart = async (whitetail_year = '2018') => {
   mouseOverSummaryText();
 
   const features = await fetchData(whitetail_year);
-  console.log('features', features);
   const extent = d3.extent(_.compact(features.map(f => Number(f.whitetail_hunting_data) )));
-  // console.log('extent', extent);
+  console.log('extent', extent);
   // const variance = d3.variance(extent);
   // console.log('variance', variance);
   // const median = d3.median(extent);

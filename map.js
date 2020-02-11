@@ -1,11 +1,11 @@
-
 /*
-
 WMU Notes Regions can be define as:
 -- North =<45
 -- Southeast 46-78
 -- Southwest >=79
 
+CSV has headers:
+-- WMU,Year,Active_Hunters,Antlered_Harvest,Antlerless_Harvest,Total_Harvest
 */
 const geoJsonPath = 'data.geojson';
 const whiteTailCSVPath = 'white-tailed_deer_2019.csv';
@@ -31,7 +31,6 @@ const width = d3.select('#map-container')
   .width
   .toFixed();
 
-
 const setMapProjection = ({ scale, center }) => d3.geoMercator()
   .scale(scale)
   .translate([width / 4, height / 6])
@@ -45,6 +44,7 @@ const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', har
       const { WMU, Year, Active_Hunters } = kill_data;
       if (mapWMU.includes(WMU) && Year === target_year) {
         const deerType = kill_data[harvest_type];
+        console.log('harvest_type', harvest_type);
         feature.whitetail_hunting_data = calcHarvestsPerHunter(Active_Hunters, deerType);
 
       }
@@ -53,7 +53,10 @@ const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', har
   return features;
 
   function calcHarvestsPerHunter (hunters, harvests) {
-    return hunters > 0 ? Number((harvests/hunters).toFixed(3)) : 0;
+    console.log('hunters', hunters);
+    console.log('harvests', harvests);
+    // return hunters > 0 ? Number((harvests/hunters).toFixed(3)) : 0;
+    return hunters;
   }
 }
 
@@ -91,10 +94,15 @@ const drawChart = async (whitetail_year = '2018') => {
   mouseOverSummaryText();
 
   const features = await fetchData(whitetail_year);
-  const extent = d3.extent(_.compact(features.map(f => f.whitetail_hunting_data)));
-  const variance = d3.variance(extent);
-  const median = d3.median(extent);
-  const domain = [median-variance, median+variance];
+  console.log('features', features);
+  const extent = d3.extent(_.compact(features.map(f => Number(f.whitetail_hunting_data) )));
+  // console.log('extent', extent);
+  // const variance = d3.variance(extent);
+  // console.log('variance', variance);
+  // const median = d3.median(extent);
+  // const domain = [median-variance, median+variance];
+  const domain = extent;
+  console.log('domain', domain);
   const colorRange = ['#fff','#59b300', '#006400'];
 
   const color = d3.scaleLinear()
@@ -118,6 +126,7 @@ const drawChart = async (whitetail_year = '2018') => {
     d3.select(this).attr('fill', '#ffcb6b');
     const { WMU, SYS_AREA } = d.properties;
     const area = Math.round(SYS_AREA/1000000);
+    console.log('d.whitetail_hunting_data', d.whitetail_hunting_data);
     const text = 'WMU: ' + WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
     mouseOverSummaryText(text);
   }

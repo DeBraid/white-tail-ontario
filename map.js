@@ -129,9 +129,7 @@ const drawChart = async (whitetail_year = '2018') => {
 
   function onMouseOver(d, i) {
     d3.select(this).attr('fill', '#ffcb6b');
-    const metric = d3.select('#harvest-dropdown')
-      .property('value')
-      .replace(/_/g, ' ');
+    const metric = harvestDropdownMetric();
 
     const { WMU, SYS_AREA } = d.properties;
     // console.log('d.properties', d.properties);
@@ -146,9 +144,17 @@ const drawChart = async (whitetail_year = '2018') => {
     mouseOverSummaryText();
   }
 
+  function harvestDropdownMetric () {
+    return d3.select('#harvest-dropdown')
+      .property('value')
+      .replace(/_/g, ' ');
+  }
+
   function setDomainText([min,max]) {
+    const harvestType = harvestDropdownMetric();
+    const text = harvestType + ' - Min: ' + min + ', Max: ' + max;
     d3.select("#domain")
-      .text('Min: ' + min + ', Max: ' + max);
+      .text(text);
   }
 
   const onDropdownChange = () => {

@@ -43,10 +43,7 @@ const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', har
     white_tails.map((kill_data) => {
       const { WMU, Year, Active_Hunters } = kill_data;
       if (mapWMU.includes(WMU) && Year === target_year) {
-        console.log('harvest_type.split', harvest_type.split('_Per')[0]);
         const deerType = kill_data[harvest_type.split('_Per')[0]];
-        // const deerType = kill_data[harvest_type];
-        console.log('deerType', deerType);
         feature.whitetail_hunting_data = calcWhiteTailData(deerType, Active_Hunters, harvest_type);
 
       }
@@ -55,10 +52,7 @@ const whiteTailToMapFeatures = (map_data, white_tails, target_year = '2018', har
   return features;
 
   function calcWhiteTailData (n, d, harvest_type) {
-    console.log('n', n);
-    console.log('d', d);
     let val = n;
-    console.log('harvest_type.includes', harvest_type.includes('_Per'));
     if (d && harvest_type.includes('_Per')) {
       val = d > 0 ? Number((n/d).toFixed(3)) : 0;
     }
@@ -100,13 +94,18 @@ const drawChart = async (whitetail_year = '2018') => {
   mouseOverSummaryText();
 
   const features = await fetchData(whitetail_year);
-  const extent = d3.extent(_.compact(features.map(f => Number(f.whitetail_hunting_data) )));
-  console.log('extent', extent);
+
+  /*
+    TODO how to make this work with ratios vs. counts...
+    If domain is too narrow or too broad the map looks homogeneous
+    seems like the DATA should be better manipluated, NOT the extent / etc
+  */
+
   // const variance = d3.variance(extent);
   // console.log('variance', variance);
   // const median = d3.median(extent);
   // const domain = [median-variance, median+variance];
-  const domain = extent;
+  const domain = d3.extent(_.compact(features.map(f => Number(f.whitetail_hunting_data) )));
   console.log('domain', domain);
   const colorRange = ['#fff','#59b300', '#006400'];
 
@@ -129,10 +128,15 @@ const drawChart = async (whitetail_year = '2018') => {
 
   function onMouseOver(d, i) {
     d3.select(this).attr('fill', '#ffcb6b');
+    const metric = d3.select('#harvest-dropdown')
+      .property('value')
+      .replace(/_/g, ' ');
+
     const { WMU, SYS_AREA } = d.properties;
+    // console.log('d.properties', d.properties);
+    // console.log('d.whitetail_hunting_data', d.whitetail_hunting_data);
     const area = Math.round(SYS_AREA/1000000);
-    console.log('d.whitetail_hunting_data', d.whitetail_hunting_data);
-    const text = 'WMU: ' + WMU + ' - ' + area + ' KM² - Harvest Per Hunter: ' + d.whitetail_hunting_data;
+    const text = 'WMU: ' + WMU + ' - ' + area + ' KM² - ' + metric + ' ' + d.whitetail_hunting_data;
     mouseOverSummaryText(text);
   }
 

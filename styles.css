@@ -47,3 +47,7 @@ select {
 #wmu-summary {
   font-size: 1.5em;
 }
+
+#map-container {
+  margin-top: 1em;
+}

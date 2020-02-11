@@ -106,6 +106,7 @@ const drawChart = async (whitetail_year = '2018') => {
   // const median = d3.median(extent);
   // const domain = [median-variance, median+variance];
   const domain = d3.extent(_.compact(features.map(f => Number(f.whitetail_hunting_data) )));
+  setDomainText(domain);
   console.log('domain', domain);
   const colorRange = ['#fff','#59b300', '#006400'];
 
@@ -145,12 +146,16 @@ const drawChart = async (whitetail_year = '2018') => {
     mouseOverSummaryText();
   }
 
+  function setDomainText([min,max]) {
+    d3.select("#domain")
+      .text('Min: ' + min + ', Max: ' + max);
+  }
+
   const onDropdownChange = () => {
       d3.selectAll('svg').remove();
       drawChart();
   }
   d3.selectAll(".dropdown").on("change", onDropdownChange);
-
 }
 
 drawChart();
